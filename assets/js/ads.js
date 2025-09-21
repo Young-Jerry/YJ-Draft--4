@@ -1,103 +1,145 @@
-/* ============================================================================
-   ads.js – Ad posting, editing, deleting
-   ============================================================================ */
+/* ==========================================================================
+   ads.js – Ad creation, editing, and management
+   ========================================================================== */
 (function () {
   "use strict";
 
-  // ------------------ POST AD ------------------
-  function postAd(data) {
-    const user = SessionAPI.currentUser();
-    if (!user) {
-      alert("You must be logged in to post an ad.");
+  const currentUser = Session.getCurrentUser();
+  if (!currentUser) {
+    alert("You must be logged in to post an ad.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Elements
+  const adForm = document.getElementById("adForm");
+  const adTitle = document.getElementById("adTitle");
+  const adDescription = document.getElementById("adDescription");
+  const adCategory = document.getElementById("adCategory");
+  const adSubcategory = document.getElementById("adSubcategory");
+  const adImages = document.getElementById("adImages");
+  const imagePreview = document.getElementById("imagePreview");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const adminLink = document.getElementById("adminLink");
+
+  let selectedImages = [];
+  let editingAdId = null;
+
+  if (currentUser.role === "admin") {
+    adminLink.style.display = "inline-block";
+  }
+
+  // Handle image uploads (max 3)
+  adImages.addEventListener("change", function () {
+    const files = Array.from(adImages.files);
+
+    if (selectedImages.length + files.length > 3) {
+      alert("You can only upload up to 3 images.");
       return;
     }
 
-    const ads = StorageAPI.ads();
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        selectedImages.push(e.target.result);
+        renderPreview();
+      };
+      reader.readAsDataURL(file);
+    });
 
-    const ad = {
-      id: NB.uid("ad"),
-      userId: user.id,
-      username: user.username,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      subcategory: data.subcategory,
-      images: data.images,
-      createdAt: Date.now(),
-      expiry: Date.now() + data.expiryDays * 24 * 60 * 60 * 1000,
-    };
+    adImages.value = ""; // reset input
+  });
 
-    ads.push(ad);
-    StorageAPI.saveAds(ads);
-    alert("Ad posted successfully!");
-    window.location.href = "index.html";
-  }
+  function renderPreview() {
+    imagePreview.innerHTML = "";
+    selectedImages.forEach((src, index) => {
+      const imgBox = document.createElement("div");
+      imgBox.className = "img-box";
+      imgBox.innerHTML = `
+        <img src="${src}" alt="Ad Image ${index + 1}">
+        <button type="button" class="remove-img" data-index="${index}">X</button>
+      `;
+      imagePreview.appendChild(imgBox);
+    });
 
-  // ------------------ INIT FORM ------------------
-  function initForm() {
-    const form = document.getElementById("adForm");
-    if (!form) return;
-
-    AuthAPI.requireAuth(); // ensure logged in
-
-    const imageInput = document.getElementById("imageInput");
-    const preview = document.getElementById("imagePreview");
-    let images = [];
-
-    // Image preview + limit to 3
-    imageInput.addEventListener("change", () => {
-      const files = Array.from(imageInput.files).slice(0, 3);
-      images = [];
-
-      preview.innerHTML = "";
-      files.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          images.push(e.target.result);
-          const imgEl = document.createElement("div");
-          imgEl.className = "preview-item";
-          imgEl.innerHTML = `
-            <img src="${e.target.result}" alt="Ad image ${index+1}" />
-            <button type="button" data-index="${index}">Delete</button>
-          `;
-          preview.appendChild(imgEl);
-        };
-        reader.readAsDataURL(file);
+    document.querySelectorAll(".remove-img").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedImages.splice(btn.dataset.index, 1);
+        renderPreview();
       });
     });
-
-    // Delete preview image
-    preview.addEventListener("click", (e) => {
-      if (e.target.tagName === "BUTTON") {
-        const index = parseInt(e.target.dataset.index, 10);
-        images.splice(index, 1);
-        e.target.parentElement.remove();
-      }
-    });
-
-    // Handle form submit
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const title = document.getElementById("title").value.trim();
-      const description = document.getElementById("description").value.trim();
-      const category = document.getElementById("category").value;
-      const subcategory = document.getElementById("subcategory").value;
-      const expiryDays = parseInt(document.getElementById("expiry").value, 10);
-
-      if (!title || !description || !category || !subcategory) {
-        alert("Please fill all fields.");
-        return;
-      }
-
-      postAd({ title, description, category, subcategory, images, expiryDays });
-    });
   }
 
-  // ------------------ EXPORT ------------------
-  window.AdsAPI = { postAd };
+  // Load ad if editing
+  function loadEditingAd() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("edit")) {
+      editingAdId = params.get("edit");
+      const ads = Storage.get("nb_ads_v1") || [];
+      const ad = ads.find(a => a.id === editingAdId && a.owner === currentUser.username);
 
-  // ------------------ INIT ------------------
-  document.addEventListener("DOMContentLoaded", () => {
-    initForm();
+      if (!ad) return;
+
+      adTitle.value = ad.title;
+      adDescription.value = ad.description;
+      adCategory.value = ad.category;
+      adSubcategory.value = ad.subcategory || "";
+      selectedImages = ad.images || [];
+      renderPreview();
+    }
+  }
+
+  // Save ad
+  adForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const ads = Storage.get("nb_ads_v1") || [];
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 7);
+
+    if (editingAdId) {
+      // Update existing ad
+      const index = ads.findIndex(a => a.id === editingAdId && a.owner === currentUser.username);
+      if (index !== -1) {
+        ads[index] = {
+          ...ads[index],
+          title: adTitle.value.trim(),
+          description: adDescription.value.trim(),
+          category: adCategory.value,
+          subcategory: adSubcategory.value.trim(),
+          images: selectedImages,
+        };
+      }
+    } else {
+      // Create new ad
+      const newAd = {
+        id: Date.now().toString(),
+        title: adTitle.value.trim(),
+        description: adDescription.value.trim(),
+        category: adCategory.value,
+        subcategory: adSubcategory.value.trim(),
+        images: selectedImages,
+        owner: currentUser.username,
+        phone: currentUser.phone,
+        createdAt: new Date().toISOString(),
+        expiry: expiryDate.toISOString().split("T")[0],
+      };
+      ads.push(newAd);
+    }
+
+    Storage.set("nb_ads_v1", ads);
+    alert("Ad saved successfully!");
+    window.location.href = "profile.html";
   });
+
+  // Logout
+  logoutBtn.addEventListener("click", function () {
+    if (confirm("Are you sure you want to logout?")) {
+      Session.clear();
+      window.location.href = "login.html";
+    }
+  });
+
+  // Init
+  loadEditingAd();
 })();
