@@ -1,1 +1,62 @@
-<!-- Profile page -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Profile — Nepali Bazar</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/core.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo">Nepali Bazar</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="sell.html">Sell</a>
+      <a href="profile.html" class="active">Profile</a>
+      <a href="admin.html" id="adminLink" style="display:none;">Admin</a>
+      <button id="logoutBtn">Logout</button>
+    </nav>
+  </header>
+
+  <main class="profile-container">
+    <section class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">S</div>
+      <div>
+        <h2 id="profileUsername">Username</h2>
+        <p id="profilePhone">Phone: -</p>
+      </div>
+    </section>
+
+    <section class="profile-actions">
+      <h3>Account Settings</h3>
+      <label>
+        Phone Number:
+        <input type="text" id="phoneInput">
+      </label>
+      <label>
+        Change Password:
+        <input type="password" id="newPasswordInput" placeholder="New password">
+      </label>
+      <button id="saveProfileBtn">Save Changes</button>
+    </section>
+
+    <section class="profile-ads">
+      <h3>My Ads</h3>
+      <div id="myAdsContainer" class="ads-grid"></div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/profile.js"></script>
+</body>
+</html>
