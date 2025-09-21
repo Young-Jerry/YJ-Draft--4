@@ -1,1 +1,70 @@
-<!-- Sell page -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Post Ad — Nepali Bazar</title>
+  <link rel="stylesheet" href="assets/css/core.css" />
+  <link rel="stylesheet" href="assets/css/app.css" />
+</head>
+<body>
+  <header class="nb-header">
+    <h1>Post an Ad</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="products.html">Browse</a>
+      <a href="profile.html">Profile</a>
+      <a href="admin.html" id="adminLink" style="display:none">Admin</a>
+      <a href="login.html" id="loginLink">Login</a>
+      <a href="#" id="logoutLink" style="display:none">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <form id="adForm">
+      <input type="text" id="title" placeholder="Ad Title" required />
+      <textarea id="description" placeholder="Description" required></textarea>
+
+      <!-- Category & Subcategory -->
+      <label>Category</label>
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Vehicles">Vehicles</option>
+        <option value="Furniture">Furniture</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label>Subcategory</label>
+      <select id="subcategory" required>
+        <option value="">Select Subcategory</option>
+        <option value="Mobile Phones">Mobile Phones</option>
+        <option value="Laptops">Laptops</option>
+        <option value="Cars">Cars</option>
+        <option value="Bikes">Bikes</option>
+        <option value="Chairs">Chairs</option>
+        <option value="Tables">Tables</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <!-- Images -->
+      <label>Upload up to 3 images</label>
+      <input type="file" id="imageInput" accept="image/*" multiple />
+      <div id="imagePreview" class="preview"></div>
+
+      <!-- Expiry -->
+      <label>Expiry (days)</label>
+      <input type="number" id="expiry" min="1" max="7" value="7" />
+
+      <button type="submit">Post Ad</button>
+    </form>
+  </main>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/session.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/ads.js"></script>
+</body>
+</html>
