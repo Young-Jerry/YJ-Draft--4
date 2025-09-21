@@ -1,80 +1,104 @@
-/* ============================================================================
-   app.js – Homepage + Ads rendering
-   ============================================================================ */
+/* ==========================================================================
+   app.js – Homepage ads display and search
+   ========================================================================== */
 (function () {
   "use strict";
 
-  // ------------------ RENDER ADS ------------------
-  function renderAds() {
-    const adsContainer = document.getElementById("adsContainer");
-    const ads = StorageAPI.ads();
+  const currentUser = Session.getCurrentUser();
+  const adsContainer = document.getElementById("adsContainer");
+  const searchInput = document.getElementById("searchInput");
+  const loginLogoutBtn = document.getElementById("loginLogoutBtn");
+  const profileLink = document.getElementById("profileLink");
+  const adminLink = document.getElementById("adminLink");
 
-    // Clear expired ads (auto-expire after 7 days)
-    const now = Date.now();
-    const validAds = ads.filter((ad) => ad.expiry > now);
-    StorageAPI.saveAds(validAds);
+  const adModal = document.getElementById("adModal");
+  const closeModal = document.getElementById("closeModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalDescription = document.getElementById("modalDescription");
+  const modalCategory = document.getElementById("modalCategory");
+  const modalPhone = document.getElementById("modalPhone");
+  const modalExpiry = document.getElementById("modalExpiry");
+  const modalImages = document.getElementById("modalImages");
 
-    // Render
-    adsContainer.innerHTML = "";
-    validAds.forEach((ad) => {
-      const el = document.createElement("div");
-      el.className = "ad-card";
-      el.innerHTML = `
-        <div class="ad-image">
-          <img src="${ad.images[0] || 'assets/images/placeholder.png'}" alt="${ad.title}" />
-        </div>
-        <div class="ad-info">
-          <h3>${ad.title}</h3>
-          <p>${ad.description}</p>
-          <small>Category: ${ad.category} / ${ad.subcategory}</small>
-          <br/>
-          <small>Posted by ${ad.username}</small>
-        </div>
-      `;
-      adsContainer.appendChild(el);
-    });
+  // Handle login/logout button
+  if (currentUser) {
+    loginLogoutBtn.textContent = "Logout";
+    profileLink.style.display = "inline-block";
+    if (currentUser.role === "admin") {
+      adminLink.style.display = "inline-block";
+    }
+  } else {
+    profileLink.style.display = "none";
   }
 
-  // ------------------ SEARCH ------------------
-  function initSearch() {
-    const searchInput = document.getElementById("searchBar");
-    searchInput.addEventListener("input", () => {
-      const term = searchInput.value.toLowerCase();
-      const cards = document.querySelectorAll(".ad-card");
-      cards.forEach((c) => {
-        const text = c.innerText.toLowerCase();
-        c.style.display = text.includes(term) ? "block" : "none";
-      });
-    });
-  }
-
-  // ------------------ NAV BAR ------------------
-  function initNav() {
-    const user = SessionAPI.currentUser();
-    const loginLink = document.getElementById("loginLink");
-    const logoutLink = document.getElementById("logoutLink");
-    const adminLink = document.getElementById("adminLink");
-
-    if (user) {
-      loginLink.style.display = "none";
-      logoutLink.style.display = "inline";
-      if (user.role === "admin") {
-        adminLink.style.display = "inline";
+  loginLogoutBtn.addEventListener("click", function () {
+    if (currentUser) {
+      if (confirm("Are you sure you want to logout?")) {
+        Session.clear();
+        window.location.href = "login.html";
       }
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+
+  // Render all ads
+  function renderAds(filter = "") {
+    const ads = Storage.get("nb_ads_v1") || [];
+
+    // Filter expired ads
+    const now = new Date();
+    const activeAds = ads.filter(ad => new Date(ad.expiry) >= now);
+
+    // Filter by search
+    const filteredAds = activeAds.filter(ad => {
+      const text = (ad.title + ad.description + ad.category + ad.subcategory).toLowerCase();
+      return text.includes(filter.toLowerCase());
+    });
+
+    adsContainer.innerHTML = "";
+    if (filteredAds.length === 0) {
+      adsContainer.innerHTML = "<p>No ads found.</p>";
+      return;
     }
 
-    logoutLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (confirm("Are you sure you want to logout?")) {
-        AuthAPI.logout();
-      }
+    filteredAds.forEach(ad => {
+      const adEl = document.createElement("div");
+      adEl.className = "ad-card";
+      adEl.innerHTML = `
+        <h3>${ad.title}</h3>
+        <p>${ad.category} ${ad.subcategory ? " - " + ad.subcategory : ""}</p>
+        <p><small>Expires: ${ad.expiry}</small></p>
+        <div class="ad-thumbnails">
+          ${ad.images.map(img => `<img src="${img}" alt="Ad Image">`).join("")}
+        </div>
+      `;
+      adEl.addEventListener("click", () => openModal(ad));
+      adsContainer.appendChild(adEl);
     });
   }
 
-  // ------------------ INIT ------------------
-  document.addEventListener("DOMContentLoaded", () => {
-    renderAds();
-    initSearch();
-    initNav();
+  // Open modal
+  function openModal(ad) {
+    modalTitle.textContent = ad.title;
+    modalDescription.textContent = ad.description;
+    modalCategory.textContent = ad.category + (ad.subcategory ? " - " + ad.subcategory : "");
+    modalPhone.textContent = ad.phone || "-";
+    modalExpiry.textContent = ad.expiry;
+    modalImages.innerHTML = ad.images.map(img => `<img src="${img}" alt="Ad Image">`).join("");
+
+    adModal.classList.remove("hidden");
+  }
+
+  // Close modal
+  closeModal.addEventListener("click", () => adModal.classList.add("hidden"));
+  adModal.addEventListener("click", e => {
+    if (e.target === adModal) adModal.classList.add("hidden");
   });
+
+  // Search input
+  searchInput.addEventListener("input", () => renderAds(searchInput.value));
+
+  // Init
+  renderAds();
 })();
