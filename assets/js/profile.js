@@ -6,8 +6,9 @@
 
   const currentUser = Session.getCurrentUser();
   if (!currentUser) {
-    alert("You must be logged in to view your profile.");
-    window.location.href = "login.html";
+    showConfirm("You must be logged in to view your profile.", () => {
+      window.location.href = "login.html";
+    });
     return;
   }
 
@@ -51,7 +52,7 @@
     Storage.set("nb_users_v1", users);
     Session.setCurrentUser(users[userIndex]);
 
-    alert("Profile updated successfully.");
+    showConfirm("Profile updated successfully.", () => {});
     renderProfile();
     newPasswordInput.value = "";
   });
@@ -74,8 +75,8 @@
         <h4>${ad.title}</h4>
         <p>${ad.description}</p>
         <p><small>Expires: ${ad.expiry}</small></p>
-        <button class="edit-ad" data-id="${ad.id}">Edit</button>
-        <button class="delete-ad" data-id="${ad.id}">Delete</button>
+        <button class="btn btn-warning edit-ad" data-id="${ad.id}">Edit</button>
+        <button class="btn btn-danger delete-ad" data-id="${ad.id}">Delete</button>
       `;
       myAdsContainer.appendChild(adEl);
     });
@@ -83,12 +84,12 @@
     // Delete
     document.querySelectorAll(".delete-ad").forEach(btn => {
       btn.addEventListener("click", () => {
-        if (confirm("Are you sure you want to delete this ad?")) {
+        showConfirm("Delete this ad?", () => {
           let ads = Storage.get("nb_ads_v1") || [];
           ads = ads.filter(a => a.id !== btn.dataset.id);
           Storage.set("nb_ads_v1", ads);
           renderMyAds();
-        }
+        });
       });
     });
 
@@ -102,10 +103,10 @@
 
   // Logout
   logoutBtn.addEventListener("click", function () {
-    if (confirm("Are you sure you want to logout?")) {
+    showConfirm("Are you sure you want to logout?", () => {
       Session.clear();
       window.location.href = "login.html";
-    }
+    });
   });
 
   // Init
