@@ -1,66 +1,71 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Post Ad — Nepali Bazar</title>
-  <link rel="stylesheet" href="assets/css/core.css" />
-  <link rel="stylesheet" href="assets/css/app.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Post an Ad — Nepali Bazar</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/core.css">
+  <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
-  <header class="nb-header">
-    <h1>Post an Ad</h1>
+  <header class="site-header">
+    <div class="logo">Nepali Bazar</div>
     <nav>
       <a href="index.html">Home</a>
-      <a href="products.html">Browse</a>
+      <a href="sell.html" class="active">Sell</a>
       <a href="profile.html">Profile</a>
-      <a href="admin.html" id="adminLink" style="display:none">Admin</a>
-      <a href="login.html" id="loginLink">Login</a>
-      <a href="#" id="logoutLink" style="display:none">Logout</a>
+      <a href="admin.html" id="adminLink" style="display:none;">Admin</a>
+      <button id="logoutBtn">Logout</button>
     </nav>
   </header>
 
-  <main>
+  <main class="sell-container">
+    <h2>Create / Edit Ad</h2>
+
     <form id="adForm">
-      <input type="text" id="title" placeholder="Ad Title" required />
-      <textarea id="description" placeholder="Description" required></textarea>
+      <label>
+        Title:
+        <input type="text" id="adTitle" required>
+      </label>
 
-      <!-- Category & Subcategory -->
-      <label>Category</label>
-      <select id="category" required>
-        <option value="">Select Category</option>
-        <option value="Electronics">Electronics</option>
-        <option value="Vehicles">Vehicles</option>
-        <option value="Furniture">Furniture</option>
-        <option value="Clothing">Clothing</option>
-        <option value="Other">Other</option>
-      </select>
+      <label>
+        Description:
+        <textarea id="adDescription" required></textarea>
+      </label>
 
-      <label>Subcategory</label>
-      <select id="subcategory" required>
-        <option value="">Select Subcategory</option>
-        <option value="Mobile Phones">Mobile Phones</option>
-        <option value="Laptops">Laptops</option>
-        <option value="Cars">Cars</option>
-        <option value="Bikes">Bikes</option>
-        <option value="Chairs">Chairs</option>
-        <option value="Tables">Tables</option>
-        <option value="Other">Other</option>
-      </select>
+      <label>
+        Category:
+        <select id="adCategory">
+          <option value="Electronics">Electronics</option>
+          <option value="Vehicles">Vehicles</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Real Estate">Real Estate</option>
+          <option value="Other">Other</option>
+        </select>
+      </label>
 
-      <!-- Images -->
-      <label>Upload up to 3 images</label>
-      <input type="file" id="imageInput" accept="image/*" multiple />
-      <div id="imagePreview" class="preview"></div>
+      <label>
+        Subcategory:
+        <input type="text" id="adSubcategory" placeholder="Optional">
+      </label>
 
-      <!-- Expiry -->
-      <label>Expiry (days)</label>
-      <input type="number" id="expiry" min="1" max="7" value="7" />
+      <label>
+        Upload up to 3 Images:
+        <input type="file" id="adImages" accept="image/*" multiple>
+      </label>
+
+      <div id="imagePreview" class="image-preview"></div>
 
       <button type="submit">Post Ad</button>
     </form>
   </main>
 
+  <!-- Scripts -->
   <script src="assets/js/core.js"></script>
   <script src="assets/js/storage.js"></script>
   <script src="assets/js/session.js"></script>
