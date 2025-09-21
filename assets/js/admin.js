@@ -4,11 +4,13 @@
 (function () {
   "use strict";
 
+  // ------------------ AUTH ------------------
   function requireAdmin() {
     const user = AuthAPI.requireAuth();
     if (user.role !== "admin") {
-      alert("Access denied. Admins only.");
-      window.location.href = "index.html";
+      showConfirm("Access denied. Redirect to homepage?", () => {
+        window.location.href = "index.html";
+      });
     }
     return user;
   }
@@ -32,14 +34,14 @@
   }
 
   function generateCodes() {
-    if (!confirm("This will replace old codes. Continue?")) return;
-
-    const newCodes = [];
-    for (let i = 0; i < 10; i++) {
-      newCodes.push({ code: NB.uid("code"), used: false });
-    }
-    StorageAPI.saveCodes(newCodes);
-    renderCodes();
+    showConfirm("This will replace old codes. Continue?", () => {
+      const newCodes = [];
+      for (let i = 0; i < 10; i++) {
+        newCodes.push({ code: NB.uid("code"), used: false });
+      }
+      StorageAPI.saveCodes(newCodes);
+      renderCodes();
+    });
   }
 
   // ------------------ USERS ------------------
@@ -50,7 +52,7 @@
     usersList.innerHTML = users.map(u => `
       <div class="user-item">
         <strong>${u.username}</strong> (${u.role}) - ${u.phone}
-        <button data-action="deleteUser" data-id="${u.id}">Delete</button>
+        <button class="btn btn-danger" data-action="deleteUser" data-id="${u.id}">Delete</button>
       </div>
     `).join("");
   }
@@ -63,32 +65,35 @@
     adsList.innerHTML = ads.map(ad => `
       <div class="ad-item">
         <strong>${ad.title}</strong> by ${ad.username}
-        <button data-action="deleteAd" data-id="${ad.id}">Delete</button>
+        <button class="btn btn-danger" data-action="deleteAd" data-id="${ad.id}">Delete</button>
       </div>
     `).join("");
   }
 
+  // ------------------ ACTION HANDLERS ------------------
   function handleActions(e) {
     const btn = e.target;
     const action = btn.dataset.action;
     const id = btn.dataset.id;
 
     if (action === "deleteUser") {
-      if (confirm("Delete this user?")) {
+      showConfirm("Delete this user?", () => {
         let users = StorageAPI.users();
         users = users.filter(u => u.id !== id);
         StorageAPI.saveUsers(users);
         renderUsers();
-      }
+        renderStats();
+      });
     }
 
     if (action === "deleteAd") {
-      if (confirm("Delete this ad?")) {
+      showConfirm("Delete this ad?", () => {
         let ads = StorageAPI.ads();
         ads = ads.filter(ad => ad.id !== id);
         StorageAPI.saveAds(ads);
         renderAds();
-      }
+        renderStats();
+      });
     }
   }
 
