@@ -1,1 +1,160 @@
-/* Core styles */
+/* ==========================================================================
+   core.css – Base styles, grid, neon utilities, modal system
+   ========================================================================== */
+
+/* ------------------ RESET ------------------ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: #f9f9fb;
+  color: #222;
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font: inherit;
+}
+
+/* ------------------ GRID ------------------ */
+.container {
+  width: 95%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Flex utilities */
+.flex {
+  display: flex;
+  align-items: center;
+}
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ------------------ HEADER ------------------ */
+header {
+  background: #fff;
+  padding: 1rem 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+header h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.6rem;
+  color: #0ff;
+  text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+}
+
+/* ------------------ BUTTONS ------------------ */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.btn-primary {
+  background: #0ff;
+  color: #000;
+  box-shadow: 0 0 10px #0ff, 0 0 20px #0ff inset;
+}
+.btn-primary:hover {
+  background: #00cccc;
+}
+
+.btn-danger {
+  background: #ff4444;
+  color: #fff;
+  box-shadow: 0 0 10px #ff4444;
+}
+.btn-danger:hover {
+  background: #cc0000;
+}
+
+/* ------------------ NEON ANIMATIONS ------------------ */
+.neon {
+  color: #0ff;
+  text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+  }
+  50% {
+    text-shadow: 0 0 15px #0ff, 0 0 30px #0ff, 0 0 45px #0ff;
+  }
+}
+.pulse {
+  animation: neonPulse 2s infinite;
+}
+
+/* ------------------ MODAL SYSTEM ------------------ */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal h2 {
+  margin-bottom: 1rem;
+}
+
+.modal .modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------ THEMES ------------------ */
+.theme-light {
+  --bg: #f9f9fb;
+  --text: #222;
+  --card: #fff;
+}
+
+.theme-dark {
+  --bg: #111;
+  --text: #eee;
+  --card: #1a1a1a;
+}
