@@ -15,16 +15,28 @@
 
   // ------------------ HELPERS ------------------
   window.NB = {
-    uid: function (prefix = "id") {
-      return prefix + "-" + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+    // Unique ID generator
+    uid(prefix = "id") {
+      return (
+        prefix +
+        "-" +
+        Math.random().toString(36).substring(2, 10) +
+        Date.now().toString(36)
+      );
     },
-    now: function () {
+
+    // Current timestamp
+    now() {
       return Date.now();
     },
-    daysFromNow: function (days) {
+
+    // Future timestamp (days from now)
+    daysFromNow(days) {
       return Date.now() + days * 24 * 60 * 60 * 1000;
     },
-    isExpired: function (timestamp) {
+
+    // Expiry check
+    isExpired(timestamp) {
       return Date.now() > timestamp;
     }
   };
